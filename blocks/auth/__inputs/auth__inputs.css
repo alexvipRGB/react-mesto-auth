@@ -1,0 +1,27 @@
+.auth__inputs {
+  min-width: 358px;
+  text-decoration: none;
+  font-style: normal;
+  outline: none;
+  background: none;
+  border: none;
+  padding-bottom: 13px;
+  margin: 0px 0px 23px;
+  border-style: none none solid none;
+  border-bottom: 2px solid #ccc;
+  color: #fff;
+  font-size: 14px;
+  line-height: 30px;
+}
+
+.auth__inputs:last-of-type {
+  margin: 0;
+}
+
+@media screen and (max-width: 770px) {
+  .auth__inputs {
+      min-width: 238px;
+      margin: 0px 18px 0px 22px;
+  }
+
+}

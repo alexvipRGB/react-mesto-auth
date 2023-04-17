@@ -1,0 +1,5 @@
+.popup__name_type-error {
+    display: block;
+    border: 1px solid rgba(255, 0, 0);
+    border-style: none none solid none;
+}

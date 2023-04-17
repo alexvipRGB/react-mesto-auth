@@ -1,0 +1,21 @@
+.profile__button {
+    width: 150px;
+    height: 50px;
+    border: 2px solid #FFFFFF;
+    margin: 0;
+    padding: 0;
+    background: none;
+    background-image: url(../../../images/Vector-krest.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    text-align: center;
+}
+
+@media screen and (max-width: 770px) {
+    .profile__button {
+        width: 282px;
+        margin-top: 33px;
+    }
+
+}
