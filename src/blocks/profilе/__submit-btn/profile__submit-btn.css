@@ -1,0 +1,22 @@
+.profile__submit-btn {
+  border: 1px solid #FFFFFF;
+  margin: 14px 0px 0px 0px;
+  background: none;
+  background-image: url(../../../images/Vector.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  display: block;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  text-align: center;
+}
+
+@media screen and (max-width: 770px) {
+  .profile__submit-btn {
+    width: 18px;
+    height: 18px;
+    margin: 7px 0px 0px 10px;
+  }
+
+}

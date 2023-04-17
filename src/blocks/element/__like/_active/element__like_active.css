@@ -1,0 +1,11 @@
+.element__like_active {
+    background-image: url(../../../../images/Union.svg);
+    opacity: 1;
+}
+
+.element__like_active:focus,
+.element__like_active:hover {
+    cursor: 2 2, default;
+    opacity: 1;
+    transition: 0.35s;
+}

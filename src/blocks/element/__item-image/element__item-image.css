@@ -1,0 +1,8 @@
+.element__item-image {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    display: contents;
+    border-radius: 10px 10px 0 0;
+    position: relative;
+}

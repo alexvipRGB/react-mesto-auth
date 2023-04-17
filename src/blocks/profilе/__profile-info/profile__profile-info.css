@@ -1,0 +1,19 @@
+.profile__profile-info {
+    display: grid;
+    gap: 8px 20px;
+    grid-template-columns: 1fr 30px;
+    min-width: 336px;
+    grid-template-rows: 0fr 1fr;
+    align-items: center;
+}
+
+@media screen and (max-width: 770px) {
+    .profile__profile-info {
+        min-width: 282px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px 0px;
+    }
+
+}

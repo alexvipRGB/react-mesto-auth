@@ -1,0 +1,17 @@
+.element {
+    max-width: 100%;
+    border-radius: 10px;
+    display: grid;
+    padding: 0;
+    margin: 0;
+    grid-template-columns: repeat(3, 282px);
+    gap: 20px 17px;
+}
+
+@media screen and (max-width: 905px) {
+    .element {
+        grid-template-columns: repeat(1, 282px);
+        gap: 21px;
+    }
+
+}
