@@ -11,6 +11,6 @@ root.render(
     <BrowserRouter basename='/react-mesto-auth'>
       <App />
     </BrowserRouter>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
 reportWebVitals();
