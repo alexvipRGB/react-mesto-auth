@@ -1,38 +1,53 @@
-function checkResponse(res) {
-  if (res.ok) {
-    return res.json();
+class Auth {
+  constructor({ url, headers }) {
+      this._url = url;
+      this._headers = headers;
   }
-  return Promise.reject(res.status);
+
+  _handleResponse(res) {
+      if (res.ok) {
+          return res.json();
+      } else {
+          return Promise.reject(`Ошибка: ${res.status}`);
+      }
+  }
+
+  registerUser(email, password) {
+      return fetch(`${this._url}/signup`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+      })
+          .then(this._handleResponse)
+  }
+
+  loginUser(email, password) {
+      return fetch(`${this._url}/signin`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+      })
+          .then(this._handleResponse)
+  }
+
+  getToken(token) {
+      return fetch(`${this._url}/users/me`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+          },
+      })
+          .then(this._handleResponse)
+  }
 }
 
-export  const BASE_URL = "https://auth.nomoreparties.co";
+const auth = new Auth({
+  url: 'https://auth.nomoreparties.co',
+});
 
-export function registerUser(email, password) {
-  return fetch(`${BASE_URL}/signup`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  }).then(checkResponse);
-}
-
-export function loginUser(email, password) {
-  return fetch(`${BASE_URL}/signin`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  }).then(checkResponse);
-}
-
-export function getToken(jwt) {
-  return fetch(`${BASE_URL}/users/me`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${jwt}`,
-    },
-  }).then(checkResponse);
-}
+export default auth;
