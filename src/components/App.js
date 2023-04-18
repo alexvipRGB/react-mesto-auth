@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import api from "../utils/api";
-import * as auth from "../utils/auth";
+import auth from "../utils/auth";
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
@@ -19,7 +19,7 @@ import resolve from "../images/resolve.png";
 import reject from "../images/reject.png";
 
 function App() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false)
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false)
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false)
@@ -31,10 +31,53 @@ function App() {
   const [deleteCard, setDeleteCard] = useState({})
   // Авторизация пользователя
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [emailName, setEmailName] = useState(null)
+  const [emailName, setEmail] = useState(null)
   const [infoTooltip, setInfoTooltip] = useState(false)
   const [popupImage, setPopupImage] = useState("")
   const [popupTitle, setPopupTitle] = useState("")
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      api
+        .getInitialCards()
+        .then((res) => {
+          setCards(res);
+        })
+        .catch((e) => console.log(e));
+      api
+        .getUserInfo()
+        .then((res) => {
+          setCurrentUser(res);
+        })
+        .catch((e) => console.log(e));
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+
+    function handleClickOutside(event) {
+      if (event.target.classList.contains("popup_opened")) {
+        closeAllPopups();
+      }
+
+    }
+
+    function handleEscClose(event) {
+      if (event.key === "Escape") {
+        closeAllPopups();
+      }
+    }
+
+    if ((isEditProfilePopupOpen || isAddPlacePopupOpen || isEditAvatarPopupOpen || isImagePopupOpen || infoTooltip) === true) {
+      document.addEventListener("keydown", handleEscClose);
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscClose);
+    }
+
+  }, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen, isImagePopupOpen, infoTooltip]);
 
 
   function onRegister(email, password) {
@@ -54,10 +97,12 @@ function App() {
   function onLogin(email, password) {
     auth.loginUser(email, password)
       .then((res) => {
-        localStorage.setItem("jwt", res.token);
-        setIsLoggedIn(true);
-        setEmailName(email);
-        navigate("/");
+        if (res.token) {
+          localStorage.setItem("token", res.token);
+          setIsLoggedIn(true);
+          setEmail(email);
+          navigate("/")
+        }
       })
       .catch(() => {
         setPopupImage(reject);
@@ -66,36 +111,6 @@ function App() {
       });
   }
 
-  useEffect(() => {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
-      auth.getToken(jwt)
-        .then((res) => {
-          if (res) {
-            setIsLoggedIn(true);
-            setEmailName(res.data.email);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isLoggedIn === true) {
-      navigate('/');
-    }
-  }, [isLoggedIn, navigate]);
-
-  useEffect(() => {
-    Promise.all([api.getUserInfo(), api.getInitialCards()]).then(([user, cards]) => {
-      setCurrentUser(user);
-      setCards(cards);
-    }).catch((err) => {
-      console.error(err);
-    });
-  }, []);
 
   /**
   * Получение информации о пользователе и исходных карточек при открытии страницы
@@ -123,7 +138,7 @@ function App() {
       .catch((err) => console.log(err))
   };
 
-const blurHandler = (e, paramsDirty, paramsError) => {
+  const blurHandler = (e, paramsDirty, paramsError) => {
     // eslint-disable-next-line default-case
     switch (e.target.name) {
       case "inputTitle":
@@ -165,6 +180,27 @@ const blurHandler = (e, paramsDirty, paramsError) => {
       })
       .catch((err) => console.log(err))
   };
+
+  function tokenCheck() {
+    const token = localStorage.getItem("token")
+    if (token) {
+      auth.getToken(token)
+        .then((res) => {
+          if (res) {
+            setIsLoggedIn(true);
+            setEmail(res.data.email);
+            navigate("/");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
+  useEffect(() => {
+    tokenCheck();
+  }, [isLoggedIn]);
 
   function clearValidationError(
     setFirstInputDirty,
@@ -218,42 +254,15 @@ const blurHandler = (e, paramsDirty, paramsError) => {
     setInfoTooltip(false);
   };
 
-  useEffect(() => {
-
-    function handleClickOutside(event) {
-      if (event.target.classList.contains("popup_opened")) {
-        closeAllPopups();
-      }
-
-    }
-
-    function handleEscClose(event) {
-      if (event.key === "Escape") {
-        closeAllPopups();
-      }
-    }
-
-    if ((isEditProfilePopupOpen || isAddPlacePopupOpen || isEditAvatarPopupOpen || isImagePopupOpen || infoTooltip) === true) {
-      document.addEventListener("keydown", handleEscClose);
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscClose);
-    }
-
-  }, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen, isImagePopupOpen, infoTooltip]);
 
   function onSignOut() {
     setIsLoggedIn(false);
-    setEmailName(null);
-    navigate("/sign-in");
-    localStorage.removeItem("jwt");
+    localStorage.removeItem('token');
   }
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
-      <div className="page">
+    <div className="page">
+      <CurrentUserContext.Provider value={currentUser}>
         <div className="page__container">
           <Routes>
             <Route path="/sign-in" element={
@@ -287,11 +296,12 @@ const blurHandler = (e, paramsDirty, paramsError) => {
                 <Footer />
               </>
             } />
-            <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/sign-in"} />} />
+            <Route path="*" element={isLoggedIn ? <Navigate to="/" replace /> : <Navigate to="/sign-in" replace />} />
           </Routes>
 
           <EditProfilePopup
             isOpen={isEditProfilePopupOpen}
+            isLogged={isLoggedIn}
             onClose={closeAllPopups}
             onSubmit={handleUpdateUser}
             blurHandler={blurHandler}
@@ -300,6 +310,7 @@ const blurHandler = (e, paramsDirty, paramsError) => {
 
           <AddPlacePopup
             isOpen={isAddPlacePopupOpen}
+            isLogged={isLoggedIn}
             onClose={closeAllPopups}
             onSubmit={handleAddPlaceSubmit}
             blurHandler={blurHandler}
@@ -308,12 +319,14 @@ const blurHandler = (e, paramsDirty, paramsError) => {
 
           <EditAvatarPopup
             isOpen={isEditAvatarPopupOpen}
+            isLogged={isLoggedIn}
             onClose={closeAllPopups}
             onSubmit={handleUpdateAvatar}
             blurHandler={blurHandler}
             clearValidationError={clearValidationError}
           />
           <ConfirmDeletePopup
+            isLogged={isLoggedIn}
             isOpen={isConfirmDeletePopupOpen}
             onClose={closeAllPopups}
             onDeleteCard={handleDeleteCardSubmit}
@@ -332,8 +345,9 @@ const blurHandler = (e, paramsDirty, paramsError) => {
             onClose={closeAllPopups}
           />
         </div>
-      </div>
-    </CurrentUserContext.Provider>
+      </CurrentUserContext.Provider>
+    </div>
+
   )
 }
 
