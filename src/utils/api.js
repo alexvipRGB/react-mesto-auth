@@ -9,7 +9,9 @@ class Api {
       ? response.json()
       : Promise.reject(`${method}: ${response.status}`);
   }
-
+  _request(url, options) {
+    return fetch(url, options).then(this._checkResponse)
+  }
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, { headers: this._headers }).then(
       (res) => {
