@@ -1,9 +1,9 @@
 import Input from "./Input";
 import PopupWithForm from "./PopupWithForm";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 function EditAvatarPopup(props) {
-  const inputAvatar = useRef();
+  const [avatar, setAvatar] = useState("");
 
   const [firstInputDirty, setFirstInputDirty] = useState(false);
   const [firstInputError, setFirstInputError] = useState("can't be blank");
@@ -13,17 +13,18 @@ function EditAvatarPopup(props) {
     e.preventDefault();
 
     props.onUpdateAvatar({
-      avatar: inputAvatar.current.value,
+      avatar,
     });
   }
 
   function handleChangeAvatar(e) {
+    setAvatar(e.target.value);
     setFirstInputError(e.target.validationMessage);
     setFirstInputDirty(true);
   }
 
   function clearForm() {
-    inputAvatar.current.value = "";
+    setAvatar("");
     setSubmitButtonState(false);
     setFirstInputError("");
     setFirstInputDirty(false);
@@ -64,13 +65,15 @@ function EditAvatarPopup(props) {
         type={"url"}
         name={"inputAvatarUrl"}
         placeholder={"Ссылка на картинку"}
-        uRef={inputAvatar}
+        min={"2"}
+        max={"40"}
+        params={avatar || ""}
+        handleChange={handleChangeAvatar}
         validationInput={firstInputDirty}
         validationError={firstInputError}
         checkBlur={props.blurHandler}
         dirty={setFirstInputDirty}
-        error={setFirstInputError}
-        handleChange={handleChangeAvatar}
+        error={setFirstInputError} 
       />
     </PopupWithForm>
   );

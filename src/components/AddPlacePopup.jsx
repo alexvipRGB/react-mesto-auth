@@ -1,11 +1,10 @@
 import Input from "./Input";
 import PopupWithForm from "./PopupWithForm";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 function AddPlacePopup(props) {
-  const inputPopupname = useRef();
-  const inputPopuplink = useRef();
-
+  const [name, setName] = useState("");
+  const [link, setLink] = useState("");
   const [firstInputDirty, setFirstInputDirty] = useState(false);
   const [firstInputError, setFirstInputError] = useState("can't be blank");
   const [secondInputDirty, setSecondInputDirty] = useState(false);
@@ -25,8 +24,8 @@ function AddPlacePopup(props) {
   }, [firstInputError, secondInputError]);
 
   function clearForm() {
-    inputPopupname.current.value = "";
-    inputPopuplink.current.value = "";
+    setName("");
+    setLink("");
     setSubmitButtonState(false);
     setFirstInputError("");
     setSecondInputError("");
@@ -39,11 +38,13 @@ function AddPlacePopup(props) {
   }, [props.isOpen]);
 
   function handleChangeName(e) {
+    setName(e.target.value);
     setFirstInputError(e.target.validationMessage);
     setFirstInputDirty(true);
   }
 
   function handleChangeLink(e) {
+    setLink(e.target.value);
     setSecondInputError(e.target.validationMessage);
     setSecondInputDirty(true);
   }
@@ -52,8 +53,8 @@ function AddPlacePopup(props) {
     e.preventDefault();
 
     props.onAddPlace({
-      name: inputPopupname.current.value,
-      link: inputPopuplink.current.value,
+      name,
+      link,
     });
   }
   useEffect(() => {
@@ -80,8 +81,8 @@ function AddPlacePopup(props) {
         placeholder={"Название"}
         min={"2"}
         max={"200"}
-        uRef={inputPopupname}
         handleChange={handleChangeName}
+        params={name || ""}
         validationInput={firstInputDirty}
         validationError={firstInputError}
         checkBlur={props.blurHandler}
@@ -94,8 +95,8 @@ function AddPlacePopup(props) {
         type={"url"}
         name={"linkNewMesto"}
         placeholder={"Ссылка на картинку"}
-        uRef={inputPopuplink}
         handleChange={handleChangeLink}
+        params={link || ""}
         validationInput={secondInputDirty}
         validationError={secondInputError}
         checkBlur={props.blurHandler}

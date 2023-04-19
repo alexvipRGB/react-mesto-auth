@@ -231,13 +231,18 @@ function App() {
       .catch((err) => console.log(err))
   };
 
-  useEffect(() => {
+  const isOpen =
+    isEditProfilePopupOpen ||
+    isAddPlacePopupOpen ||
+    isEditAvatarPopupOpen ||
+    isImagePopupOpen ||
+    infoTooltip;
 
+  useEffect(() => {
     function handleClickOutside(event) {
       if (event.target.classList.contains("popup_opened")) {
         closeAllPopups();
       }
-
     }
 
     function handleEscClose(event) {
@@ -246,17 +251,16 @@ function App() {
       }
     }
 
-    if ((isEditProfilePopupOpen || isAddPlacePopupOpen || isEditAvatarPopupOpen || isImagePopupOpen || infoTooltip) === true) {
+    if (isOpen) {
       document.addEventListener("keydown", handleEscClose);
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleEscClose);
-    }
-
-  }, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen, infoTooltip]);
-
+    };
+  }, [isOpen]);
+  
   return (
     <div className="page">
       <div className="page__container">
