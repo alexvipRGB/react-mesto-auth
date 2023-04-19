@@ -1,10 +1,10 @@
 import Input from "./Input";
 import PopupWithForm from "./PopupWithForm";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function AddPlacePopup(props) {
-  const [name, setName] = useState("");
-  const [link, setLink] = useState("");
+  const inputPopupname = useRef();
+  const inputPopuplink = useRef();
 
   const [firstInputDirty, setFirstInputDirty] = useState(false);
   const [firstInputError, setFirstInputError] = useState("can't be blank");
@@ -20,36 +20,30 @@ function AddPlacePopup(props) {
     }
   }
 
- useEffect(() => {
+  useEffect(() => {
     changeButtonState();
   }, [firstInputError, secondInputError]);
 
   function clearForm() {
-    setName("");
-    setLink("");
+    inputPopupname.current.value = "";
+    inputPopuplink.current.value = "";
+    setSubmitButtonState(false);
+    setFirstInputError("");
+    setSecondInputError("");
+    setSecondInputDirty(false);
+    setFirstInputDirty(false);
   }
 
- useEffect(() => {
-    setSubmitButtonState(false);
-
-    props.clearValidationError(
-      setFirstInputDirty,
-      setFirstInputError,
-      setSecondInputDirty,
-      setSecondInputError
-    );
+  useEffect(() => {
     clearForm();
-
-  }, [props.isOpen, firstInputDirty, firstInputError, secondInputDirty,secondInputError]);
+  }, [props.isOpen]);
 
   function handleChangeName(e) {
-    setName(e.target.value);
     setFirstInputError(e.target.validationMessage);
     setFirstInputDirty(true);
   }
 
   function handleChangeLink(e) {
-    setLink(e.target.value);
     setSecondInputError(e.target.validationMessage);
     setSecondInputDirty(true);
   }
@@ -58,11 +52,14 @@ function AddPlacePopup(props) {
     e.preventDefault();
 
     props.onAddPlace({
-      name,
-      link,
-    }); 
+      name: inputPopupname.current.value,
+      link: inputPopuplink.current.value,
+    });
   }
+  useEffect(() => {
+    changeButtonState(firstInputError, firstInputDirty, secondInputDirty, secondInputError);
 
+  }, [firstInputError, firstInputDirty, secondInputDirty, secondInputError]);
   return (
     <PopupWithForm
       name={"popupNewMesto"}
@@ -83,7 +80,7 @@ function AddPlacePopup(props) {
         placeholder={"Название"}
         min={"2"}
         max={"200"}
-        params={name}
+        uRef={inputPopupname}
         handleChange={handleChangeName}
         validationInput={firstInputDirty}
         validationError={firstInputError}
@@ -97,7 +94,7 @@ function AddPlacePopup(props) {
         type={"url"}
         name={"linkNewMesto"}
         placeholder={"Ссылка на картинку"}
-        params={link}
+        uRef={inputPopuplink}
         handleChange={handleChangeLink}
         validationInput={secondInputDirty}
         validationError={secondInputError}
